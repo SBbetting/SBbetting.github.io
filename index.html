@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> World Cup Betting</title>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<style>
+    .fa {
+        cursor: pointer;
+        font-size: 50px;
+    }
+
+    .fa-hide {
+        display: none
+    }
+
+    .q {
+        font-weight: bold;
+    }
+</style>
+
+
+<body>
+    <div class="container">
+
+
+            <header class="w3-display-container w3-content w3-wide" style="max-width:1200px;min-width:500px">
+                    <h1>SB Betting </h1>
+                    <p> 
+                        Contract State:  <span id="state" style="margin-right: 30px">  </span>  <br> 
+                        Prize Pool: <span id="pool"> </span> SB <br>
+                        Your address: <span id="user"> </span>  <br>
+                        Your have: <span id="sbamount"> </span> SB <br>
+                    </p> 
+                    <a id="address"> check the contract on Etherscan </a>
+                    <br>
+                    <br>
+                    <p class="q">如果你觉得这个游戏有意思，请考虑捐赠一点ETH给我地址。谢谢</p>
+                    <p class="q">consider donation: 0xACcb02cd5d0fF27858Ed279c676bE242d1431BDe</p>
+        
+            </header>
+
+
+        <div style="max-width:2000px;margin-top:50px">
+        </hr>
+                    <div style="margin-bottom:30px">
+                        <h4> Step1: Deposit 100 SB into the Contract </h3>
+                        <button id="approve" onClick="approve()">Approve</button>
+                    </div>
+            
+                    <div style="margin-bottom:30px">
+                        <h4> Step2: Pick the Score (before Game starts)</h4>
+                        SWEDON <input type="text" id="home" placeholder="0" style="margin-bottom: 10px"> :
+                        <input type="text" id="guest" placeholder="0" style="margin-bottom: 10px">  KOREA
+                        <br>
+                        <button id="confirm" onClick="bet()">Confirm</button>
+                    </div>
+
+                    <i class="fa fa-hide"></i><br>
+                    <p id="txstatus"></p>
+        </div>
+
+
+        <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+        <script src="./betterContractABI.js"></script>
+        <script src="./SBContractABI.js"></script>
+        <script src="./common.js"></script>
+        <script>
+ 
+
+            var SBContract = web3.eth.contract(SB_CONTRACT_ABI);
+            var BetContract = web3.eth.contract(betterContracABI);
+            var SBInstance = SBContract.at(SB_CONTRACT_ADDRESSES);
+            var BetInstance = BetContract.at(BET_CONTRACT_ADDRESSES);
+
+           var accounts;
+            $("#address").attr('href', explorer + BET_CONTRACT_ADDRESSES).attr("target", "_blank");
+
+
+            window.addEventListener('load', function () {
+                // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+                if (typeof web3 !== 'undefined') {
+                    // Use Mist/MetaMask's provider    
+                    // if (web3.version.network == "1") {
+                        web3 = new Web3(web3.currentProvider);
+                        init();
+                    // }
+                    // else (
+                    //     alert("switch to mainnet first")
+                    // )
+                }
+                else {
+                    Alert('Please install/load your Metamask First')
+                    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+                }
+            })
+
+                
+
+            function init(){
+                accounts = web3.eth.accounts;
+                // method to get user account
+                $('#user').text(accounts[0]);
+                // method to get the prize pool size
+                BetInstance.getPoolSize.call({
+                    from: accounts[0]
+                }
+                , function (err, amount) {
+                    $("#pool").show().text(amount);
+                })
+
+                // method to get the contract state
+                var contractState;
+                BetInstance.state.call({
+                    from: accounts[0]
+                }
+                , function (err, amount) {
+                    contractState="Error"
+                    if(amount==0){
+                        contractState="OPEN";
+                    }
+                    if(amount==1){
+                        contractState="CLOSE";
+                    }
+                    if(amount==2){
+                        contractState="RESOLVE";
+                    }
+                        
+                    $("#state").show().text(contractState);
+                })
+
+                // method to get the contract state
+                SBInstance.balanceOf.call(accounts[0],{
+                    from: accounts[0]
+                }
+                , function (err, amount) {
+                    $("#sbamount").show().text(amount);
+                })
+
+            }
+                
+
+                var txhash;
+                // approve 100 SB for each bettings, call the old address
+                async function approve() {
+                        SBInstance.approve.sendTransaction(BET_CONTRACT_ADDRESSES,100, {
+                        from: accounts[0],
+                        value: 0
+                        }, function (err, result) {
+                            if (err) {
+                                console.log(err)
+                            }
+                            else {
+                                spin();
+                                txhash = result;
+                                setQuery = setInterval(function () {
+                                    setTxQuery();
+                                }, 10000);
+                               // $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
+                            }
+                        })
+
+                }
+
+
+
+                async function bet() {
+                        var home = $('#home').val().trim();
+                        var guest = $('#guest').val().trim();
+                        console.log("home score:"+home);
+                        console.log("guest score:"+guest);
+                        BetInstance.bet.sendTransaction(home,guest,{
+                        from: accounts[0],
+                        value: 0
+                        }, function (err, result) {
+                            if (err) {
+                                console.log(err)
+                            }
+                            else {
+                                spin();
+                                txhash = result;
+                                setQuery = setInterval(function () {
+                                    setTxQuery();
+                                }, 10000);
+                               // $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
+                            }
+                        })
+
+                }
+
+
+                function setTxQuery() {
+                        web3.eth.getTransactionReceipt(txhash, function (err, receipt) {
+                            if (err) {
+                                console.log(err);
+                                stopSpin();
+                                $("#txstatus").text("Something is wrong")
+                            } else {
+                                console.log(receipt);
+                                if (receipt) { // get receipt
+                                    clearInterval(setQuery);
+                                    
+                                    if (receipt.status == "0x1") { // success
+                                        console.log("success");
+                                        init();
+                                        stopSpin();
+                                        $("#txstatus").text("Tx Success! ")
+                                    }
+                                    if (receipt.status == "0x0") {
+                                        stopSpin();
+                                        init();
+                                        console.log("fail");
+                                        $("#txstatus").text("Tx Failed!")
+                                    }
+                                    
+                                }
+                            }
+                        })
+                    }
+
+
+
+
+            
+            // async function distribute() {
+
+            //     $("#txstatus").text("");
+
+            //     // check if all the addresses are valid
+            //     showAddress(csvResult);
+            //     if (readytoTransfer === false) {
+            //         alert("Some of your addresses do not look right");
+            //         return
+            //     }
+
+            //     var amount = $('#amount').val().trim();
+            //     //
+            //     // check amount
+            //     if (isNaN(amount)) {
+            //         alert("The amount you send is NOT a number!");
+            //         return false;
+            //     }
+
+            //     if (amount <= 0) {
+            //         alert("The amount you send needs to be more than zero!");
+            //         return false;
+            //     }
+
+            //     var addresses = csvResult;
+
+            //     console.log(amount)
+            //     contractInstance.distribute.sendTransaction(addresses, {
+            //         from: accounts[0],
+            //         value: web3.toWei(amount, 'ether')
+            //     }, function (err, result) {
+            //         if (err) {
+            //             console.log(err)
+            //         }
+            //         else {
+            //             spin();
+            //             txhash = result;
+            //             setQuery = setInterval(function () {
+            //                 setTxQuery();
+            //             }, 10000);
+            //             $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
+            //         }
+            //     })
+            // }
+
+
+            
+
+
+            function spin() {
+                $(".fa").removeClass().addClass('fa fa-cog fa-spin')
+                $("#txstatus").text("waiting for transaction...")
+            }
+
+            function stopSpin() {
+                $(".fa").removeClass().addClass('fa fa-hide')
+            }
+
+        </script>
+
+        </body
