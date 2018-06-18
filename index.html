@@ -34,18 +34,22 @@
 
 
             <header class="w3-display-container w3-content w3-wide" style="max-width:1200px;min-width:500px">
-                    <h1>SB Betting </h1>
+                <br>
+                <br>
+                <br>
+                    <h1>SB Betting - 赏家人世界杯大竞猜</h1>
                     <p> 
-                        Contract State:  <span id="state" style="margin-right: 30px">  </span>  <br> 
-                        Prize Pool: <span id="pool"> </span> SB <br>
-                        Your address: <span id="user"> </span>  <br>
-                        Your have: <span id="sbamount"> </span> SB <br>
+                        合约状态:  <span id="state" style="margin-right: 30px">  </span>  <br> 
+                        奖池: <span id="pool"> </span> SB <br>
+                        你的以太坊地址: <span id="user"> </span>  <br>
+                        你拥有: <span id="sbamount"> </span> SB <br>
                     </p> 
-                    <a id="address"> check the contract on Etherscan </a>
+                    <a id="address"> 在etherscan上查看合约 </a>
                     <br>
                     <br>
-                    <p class="q">如果你觉得这个游戏有意思，请考虑捐赠一点ETH给我地址。谢谢</p>
-                    <p class="q">consider donation: 0xACcb02cd5d0fF27858Ed279c676bE242d1431BDe</p>
+                    <p class="q">开发者: crypto_investor</p>
+                    <p class="q">如果你觉得这个游戏有趣，请考虑捐赠一点ETH给作者。谢谢</p>
+                    <p class="q"> 0xA2b2100a51B80CcA1C9cC514150a910154EFC12e</p>
         
             </header>
 
@@ -53,20 +57,27 @@
         <div style="max-width:2000px;margin-top:50px">
         </hr>
                     <div style="margin-bottom:30px">
-                        <h4> Step1: Deposit 100 SB into the Contract </h3>
-                        <button id="approve" onClick="approve()">Approve</button>
+                        <h4> Step1: 允许竞猜合约从你的账户取出100SB </h3>
+                        <button id="approve" onClick="approve()">允许</button>
                     </div>
             
                     <div style="margin-bottom:30px">
-                        <h4> Step2: Pick the Score (before Game starts)</h4>
-                        SWEDON <input type="text" id="home" placeholder="0" style="margin-bottom: 10px"> :
-                        <input type="text" id="guest" placeholder="0" style="margin-bottom: 10px">  KOREA
+                        <h4> Step2: 在比赛开始前选择比分</h4>
+                        瑞典 <input type="text" id="home" placeholder="0" style="margin-bottom: 10px"> :
+                        <input type="text" id="guest" placeholder="0" style="margin-bottom: 10px">  韩国
                         <br>
-                        <button id="confirm" onClick="bet()">Confirm</button>
+                        <button id="confirm" onClick="bet()">确认</button>
+                    </div>
+
+                    <div style="margin-bottom:30px">
+                            <h4> Step3: 比赛结束后合约把奖池的SB分发给获胜的赏家人</h4>
+                            <h4> 如无人猜中正确比分，则奖池自己的累计到下一场</h4>
                     </div>
 
                     <i class="fa fa-hide"></i><br>
                     <p id="txstatus"></p>
+
+                    
         </div>
 
 
@@ -90,13 +101,13 @@
                 // Checking if Web3 has been injected by the browser (Mist/MetaMask)
                 if (typeof web3 !== 'undefined') {
                     // Use Mist/MetaMask's provider    
-                    // if (web3.version.network == "1") {
+                    if (web3.version.network == "1") {
                         web3 = new Web3(web3.currentProvider);
                         init();
-                    // }
-                    // else (
-                    //     alert("switch to mainnet first")
-                    // )
+                    }
+                    else (
+                        alert("switch to mainnet first")
+                    )
                 }
                 else {
                     Alert('Please install/load your Metamask First')
