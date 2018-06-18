@@ -129,7 +129,7 @@ contract WorldCupGame {
         _resolveWinningResult();
         if(winnerCounter==0){
             // no one is correct, send the token to the owner address;
-            token.transfer(owner,totalPoolSize);
+            // token.transfer(owner,totalPoolSize);
         }else{ // someone get the correct guess
             for(uint256 i=0;i<winnerCounter;i<i++){
               token.transfer(winners[i],totalPoolSize.div(winnerCounter));// the remiander should be small enough to be ignored
