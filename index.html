@@ -129,7 +129,7 @@
                     from: accounts[0]
                 }
                 , function (err, amount) {
-                    $("#pool").show().text(amount);
+                    $("#pool").show().text(amount/1e18);
                 })
 
                 // method to get the contract state
@@ -140,13 +140,13 @@
                 , function (err, amount) {
                     contractState="Error"
                     if(amount==0){
-                        contractState="OPEN";
+                        contractState="接受投注";
                     }
                     if(amount==1){
-                        contractState="CLOSE";
+                        contractState="比赛中";
                     }
                     if(amount==2){
-                        contractState="RESOLVE";
+                        contractState="奖金已经分发";
                     }
                         
                     $("#state").show().text(contractState);
@@ -157,7 +157,7 @@
                     from: accounts[0]
                 }
                 , function (err, amount) {
-                    $("#sbamount").show().text(amount);
+                    $("#sbamount").show().text(amount/1e18);
                 })
 
             }
@@ -166,7 +166,7 @@
                 var txhash;
                 // approve 100 SB for each bettings, call the old address
                 async function approve() {
-                        SBInstance.approve.sendTransaction(BET_CONTRACT_ADDRESSES,100, {
+                        SBInstance.approve.sendTransaction(BET_CONTRACT_ADDRESSES,100*1e18, {
                         from: accounts[0],
                         value: 0
                         }, function (err, result) {
