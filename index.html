@@ -113,7 +113,7 @@
                     )
                 }
                 else {
-                    Alert('Please install/load your Metamask First')
+                    alert('Please install/load your Metamask First')
                     // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
                 }
             })
@@ -242,58 +242,6 @@
                     }
 
 
-
-
-            
-            // async function distribute() {
-
-            //     $("#txstatus").text("");
-
-            //     // check if all the addresses are valid
-            //     showAddress(csvResult);
-            //     if (readytoTransfer === false) {
-            //         alert("Some of your addresses do not look right");
-            //         return
-            //     }
-
-            //     var amount = $('#amount').val().trim();
-            //     //
-            //     // check amount
-            //     if (isNaN(amount)) {
-            //         alert("The amount you send is NOT a number!");
-            //         return false;
-            //     }
-
-            //     if (amount <= 0) {
-            //         alert("The amount you send needs to be more than zero!");
-            //         return false;
-            //     }
-
-            //     var addresses = csvResult;
-
-            //     console.log(amount)
-            //     contractInstance.distribute.sendTransaction(addresses, {
-            //         from: accounts[0],
-            //         value: web3.toWei(amount, 'ether')
-            //     }, function (err, result) {
-            //         if (err) {
-            //             console.log(err)
-            //         }
-            //         else {
-            //             spin();
-            //             txhash = result;
-            //             setQuery = setInterval(function () {
-            //                 setTxQuery();
-            //             }, 10000);
-            //             $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
-            //         }
-            //     })
-            // }
-
-
-            
-
-
             function spin() {
                 $(".fa").removeClass().addClass('fa fa-cog fa-spin')
                 $("#txstatus").text("waiting for transaction...")
@@ -305,4 +253,4 @@
 
         </script>
 
-        </body
+    </body>
