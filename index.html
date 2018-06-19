@@ -181,7 +181,7 @@
                 var txhash;
                 // approve 100 SB for each bettings, call the old address
                 async function approve() {
-                        SBInstance.approve.sendTransaction(BET_CONTRACT_ADDRESSES,100*1e18, {
+                        SBInstance.approve.sendTransaction(BET_CONTRACT_ADDRESSES,500*1e18, {
                         from: accounts[0],
                         value: 0
                         }, function (err, result) {
