@@ -117,7 +117,7 @@
                     from: accounts[0]
                 }
                 , function (err, amount) {
-                    $("#pool").show().text(amount);
+                    $("#pool").show().text(amount/1e18);
                 })
 
                 // method to get the contract state
@@ -145,7 +145,7 @@
                     from: accounts[0]
                 }
                 , function (err, amount) {
-                    $("#sbamount").show().text(amount);
+                    $("#sbamount").show().text(amount/1e18);
                 })
 
             }
