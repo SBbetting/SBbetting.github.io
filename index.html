@@ -6,6 +6,10 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <script src="./betterContractABI.js"></script>
+    <script src="./SBContractABI.js"></script>
+    <script src="./common.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -27,245 +31,285 @@
         font-weight: bold;
     }
 
-    .status{
-        color:green;
+    .status {
+        color: green;
         font-weight: bold;
     }
-
 </style>
 
 
 <body>
     <div class="container">
-            <header class="w3-display-container w3-content w3-wide" style="max-width:1200px;min-width:500px">
-                <br>
-                <br>
-                <br>
-                    <h1>SB Betting - 赏家人世界杯大竞猜</h1>
-                    <p> 
-                        合约状态:  <strong class="status" id="state" style="margin-right: 30px">  </strong>  <br> 
-                        目前奖池: <strong class="status" id="ETHpool"> </strong> ether  and <strong class="status" id="pool"> </strong> 赏币 <br>
-                        检测到的以太坊地址: <strong class="status" id="user"> </strong>  <br>
-                        你目前拥有 <strong class="status" id="sbamount"> </strong> 赏币 <br>
-                    </p> 
-                    <a id="address"> 在etherscan上查看合约 </a>
-                    <br>
-                    <br>
-        
-            </header>
-
-
-        <div style="max-width:2000px;margin-top:50px">
-        </hr>
-                    <div style="margin-bottom:30px">
-                        <h4> Step0: 如果没有安装Metamask请先安装Chrome Metamask插件，并导入拥有赏币的以太坊账户 </h3>
-                    </div>
-                    <div style="margin-bottom:30px">
-                        <h4> Step1: 允许竞猜合约从你的账户取出500赏币 </h3>
-                        <button id="approve" onClick="approve()">允许</button>
-                    </div>
-            
-                    <div style="margin-bottom:30px">
-                        <h4> Step2: 在比赛开始前选择比分 (先第一步执行完毕)</h4>
-                        波兰 <input type="text" id="home" placeholder="0" style="margin-bottom: 10px"> :
-                        <input type="text" id="guest" placeholder="0" style="margin-bottom: 10px">  塞内加尔
+        <header class="w3-display-container w3-content w3-wide" style="max-width:1200px;min-width:500px">
+            <h1 style="margin-top:30px">SB Betting - 赏家人世界杯大竞猜</h1>
+        </header>
+        <div class="container" style="margin-top:50px">
+            <div class="row">
+                <div class="col-12">
+                    <div class='alert alert-primary' role="alert">
+                        合约状态:
+                        <strong class="status" id="state" style="margin-right: 30px"> </strong>
+                        目前奖池:
+                        <strong class="status" id="ETHpool"> </strong> ether and
+                        <strong class="status" id="pool"> </strong> 赏币
+                        <br> 检测到的以太坊地址:
+                        <strong class="status" id="user"> </strong>
+                        <br> 你目前拥有
+                        <strong class="status" id="sbamount"> </strong> 赏币
                         <br>
-                        <button id="confirm" onClick="bet()">确认</button>
+                        </p>
+                        <a id="address"> 在etherscan上查看合约 </a>
                     </div>
-
-                    <div style="margin-bottom:30px">
-                            <h4> Step3: 比赛结束后合约把奖池的ether和SB平均分发给获胜的赏家人</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <div style="margin-top:30px">
+                        <h4> Step0:</h4>
+                        <h4> 如果没有安装Metamask请先安装Chrome Metamask插件，并导入拥有赏币的以太坊账户 </h4>
+                    </div>
+                    <hr>
+                    <div style="margin-top:30px">
+                        <h4> Step1: </h4>
+                        <h4>允许竞猜合约从你的账户取出500赏币 </h4>
+                        <button type="button" class="btn btn-primary" id="approve" onClick="approve()">允许</button>
+                    </div>
+                    <hr>
+                    <div style="margin-top:30px">
+                        <h4> Step2: </h4>
+                        <h4> 在比赛开始前选择比分</h4>
+                        <h5>(请等待第一步执行完毕后再继续操作此步)</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="home"> 波兰:</label>
+                                <input type="text" class="form-control" id="home" placeholder="0">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputPassword4">塞内加尔：</label>
+                                <input type="text" class="form-control" id="guest" placeholder="0">
+                            </div>
+                            <button type="button" class="btn btn-primary" id="confirm" onClick="bet()">确认</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div style="margin-top:30px">
+                        <div style="margin-bottom:30px">
+                            <h4> Step3:</h4>
+                            <h4> 比赛结束后合约把奖池的ether和SB平均分发给获胜的赏家人</h4>
                             <h4> 如无人猜中正确比分，则奖池自动累计到下一场</h4>
+                        </div>
+                        <i class="fa fa-hide"></i>
+                        <br>
+                        <p id="txstatus"></p>
                     </div>
-
-                    <i class="fa fa-hide"></i><br>
-                    <p id="txstatus"></p>
-
-
-                    <footer>
-                        <p class="q">开发者: crypto_investor</p>
-                        <p class="q">如果你觉得这个游戏有趣，请考虑捐赠一点ETH给作者。谢谢</p>
-                        <p class="q"> 0xA2b2100a51B80CcA1C9cC514150a910154EFC12e</p>
-                    </footer>
-
-
-                    
+                </div>
+                <div class="col-4">
+                    <div style="margin-top:30px">
+                        <h4>投注列表 </h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">波兰</th>
+                                    <th scope="col">塞内加尔</th>
+                                    <th scope="col">地址</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>测试</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>测试</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>测试</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class="col-12">
+                    <div class='alert alert-primary' role="alert">
+                        <p id='easter-egg' onclick="showRealSkill()" class="q">开发者: crypto_investor</p>
+                        <p class="q">如果你觉得这个游戏有趣，请考虑捐赠一点ETH给作者。谢谢 。0xA2b2100a51B80CcA1C9cC514150a910154EFC12e</p>
+                        <p id='erhu'>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-
-
-        <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
-        <script src="./betterContractABI.js"></script>
-        <script src="./SBContractABI.js"></script>
-        <script src="./common.js"></script>
-        <script>
- 
-
-            var SBContract = web3.eth.contract(SB_CONTRACT_ABI);
-            var BetContract = web3.eth.contract(betterContracABI);
-            var SBInstance = SBContract.at(SB_CONTRACT_ADDRESSES);
-            var BetInstance = BetContract.at(BET_CONTRACT_ADDRESSES);
-
-           var accounts;
-            $("#address").attr('href', explorer + BET_CONTRACT_ADDRESSES).attr("target", "_blank");
-
-
-            window.addEventListener('load', function () {
-                // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-                if (typeof web3 !== 'undefined') {
-                    // Use Mist/MetaMask's provider    
-                    if (web3.version.network == "1") {
-                        web3 = new Web3(web3.currentProvider);
-                        init();
-                    }
-                    else (
-                        alert("switch to mainnet first")
-                    )
+    </div>
+    <script>
+        var SBContract = web3.eth.contract(SB_CONTRACT_ABI);
+        var BetContract = web3.eth.contract(betterContracABI);
+        var SBInstance = SBContract.at(SB_CONTRACT_ADDRESSES);
+        var BetInstance = BetContract.at(BET_CONTRACT_ADDRESSES);
+        var accounts;
+        $("#address").attr('href', explorer + BET_CONTRACT_ADDRESSES).attr("target", "_blank");
+        window.addEventListener('load', function () {
+            // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+            if (typeof web3 !== 'undefined') {
+                // Use Mist/MetaMask's provider    
+                if (web3.version.network == "1") {
+                    web3 = new Web3(web3.currentProvider);
+                    init();
                 }
-                else {
-                    alert('Please install/load your Metamask First')
-                    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-                }
-            })
-
-                
-
-            function init(){
-                accounts = web3.eth.accounts;
-                // method to get user account
-                $('#user').text(accounts[0]);
-                // method to get the prize pool size
-                BetInstance.getPoolSize.call({
-                    from: accounts[0]
-                }
+                else (
+                    alert("switch to mainnet first")
+                )
+            }
+            else {
+                alert('Please install/load your Metamask First')
+                // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+            }
+        })
+        function init() {
+            accounts = web3.eth.accounts;
+            // method to get user account
+            $('#user').text(accounts[0]);
+            // method to get the prize pool size
+            BetInstance.getPoolSize.call({
+                from: accounts[0]
+            }
                 , function (err, amount) {
-                    $("#pool").show().text(amount/1e18);
+                    $("#pool").show().text(amount / 1e18);
                 })
 
-                // method to get the contract state
-                var contractState;
-                BetInstance.state.call({
-                    from: accounts[0]
-                }
+            // method to get the contract state
+            var contractState;
+            BetInstance.state.call({
+                from: accounts[0]
+            }
                 , function (err, amount) {
-                    contractState="Error"
-                    if(amount==0){
-                        contractState="接受投注";
+                    contractState = "Error"
+                    if (amount == 0) {
+                        contractState = "接受投注";
                     }
-                    if(amount==1){
-                        contractState="比赛中";
+                    if (amount == 1) {
+                        contractState = "比赛中";
                     }
-                    if(amount==2){
-                        contractState="奖金已经分发";
+                    if (amount == 2) {
+                        contractState = "奖金已经分发";
                     }
-                        
+
                     $("#state").show().text(contractState);
                 })
 
-                // method to get the contract state
-                SBInstance.balanceOf.call(accounts[0],{
-                    from: accounts[0]
-                }
+            // method to get the contract state
+            SBInstance.balanceOf.call(accounts[0], {
+                from: accounts[0]
+            }
                 , function (err, amount) {
-                    $("#sbamount").show().text(amount/1e18);
+                    $("#sbamount").show().text(amount / 1e18);
                 })
 
-                // method to get ether
-                web3.eth.getBalance(BET_CONTRACT_ADDRESSES,
-                    function (err,amount){
-                        $("#ETHpool").show().text(amount/1e18);   
-                    })
+            // method to get ether
+            web3.eth.getBalance(BET_CONTRACT_ADDRESSES,
+                function (err, amount) {
+                    $("#ETHpool").show().text(amount / 1e18);
+                })
 
-            }
-                
+        }
 
-                var txhash;
-                // approve 100 SB for each bettings, call the old address
-                async function approve() {
-                        SBInstance.approve.sendTransaction(BET_CONTRACT_ADDRESSES,500*1e18, {
-                        from: accounts[0],
-                        value: 0
-                        }, function (err, result) {
-                            if (err) {
-                                console.log(err)
-                            }
-                            else {
-                                spin();
-                                txhash = result;
-                                setQuery = setInterval(function () {
-                                    setTxQuery();
-                                }, 10000);
-                               // $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
-                            }
-                        })
 
+        var txhash;
+        // approve 100 SB for each bettings, call the old address
+        async function approve() {
+            SBInstance.approve.sendTransaction(BET_CONTRACT_ADDRESSES, 500 * 1e18, {
+                from: accounts[0],
+                value: 0
+            }, function (err, result) {
+                if (err) {
+                    console.log(err)
                 }
-
-
-
-                async function bet() {
-                        var home = $('#home').val().trim();
-                        var guest = $('#guest').val().trim();
-                        console.log("home score:"+home);
-                        console.log("guest score:"+guest);
-                        BetInstance.bet.sendTransaction(home,guest,{
-                        from: accounts[0],
-                        value: 0
-                        }, function (err, result) {
-                            if (err) {
-                                console.log(err)
-                            }
-                            else {
-                                spin();
-                                txhash = result;
-                                setQuery = setInterval(function () {
-                                    setTxQuery();
-                                }, 10000);
-                               // $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
-                            }
-                        })
-
+                else {
+                    spin();
+                    txhash = result;
+                    setQuery = setInterval(function () {
+                        setTxQuery();
+                    }, 10000);
+                    // $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
                 }
+            })
 
+        }
+        async function bet() {
+            var home = $('#home').val().trim();
+            var guest = $('#guest').val().trim();
+            console.log("home score:" + home);
+            console.log("guest score:" + guest);
+            BetInstance.bet.sendTransaction(home, guest, {
+                from: accounts[0],
+                value: 0
+            }, function (err, result) {
+                if (err) {
+                    console.log(err)
+                }
+                else {
+                    spin();
+                    txhash = result;
+                    setQuery = setInterval(function () {
+                        setTxQuery();
+                    }, 10000);
+                    // $("#txonexplorer").text("check your transaction here").attr("href", explorerTx + txhash).attr("target", "_blank")
+                }
+            })
 
-                function setTxQuery() {
-                        web3.eth.getTransactionReceipt(txhash, function (err, receipt) {
-                            if (err) {
-                                console.log(err);
-                                stopSpin();
-                                $("#txstatus").text("Something is wrong")
-                            } else {
-                                console.log(receipt);
-                                if (receipt) { // get receipt
-                                    clearInterval(setQuery);
-                                    
-                                    if (receipt.status == "0x1") { // success
-                                        console.log("success");
-                                        init();
-                                        stopSpin();
-                                        $("#txstatus").text("Tx Success! ")
-                                    }
-                                    if (receipt.status == "0x0") {
-                                        stopSpin();
-                                        init();
-                                        console.log("fail");
-                                        $("#txstatus").text("Tx Failed!")
-                                    }
-                                    
-                                }
-                            }
-                        })
+        }
+        function setTxQuery() {
+            web3.eth.getTransactionReceipt(txhash, function (err, receipt) {
+                if (err) {
+                    console.log(err);
+                    stopSpin();
+                    $("#txstatus").text("Something is wrong")
+                } else {
+                    console.log(receipt);
+                    if (receipt) { // get receipt
+                        clearInterval(setQuery);
+
+                        if (receipt.status == "0x1") { // success
+                            console.log("success");
+                            init();
+                            stopSpin();
+                            $("#txstatus").text("Tx Success! ")
+                        }
+                        if (receipt.status == "0x0") {
+                            stopSpin();
+                            init();
+                            console.log("fail");
+                            $("#txstatus").text("Tx Failed!")
+                        }
+
                     }
+                }
+            })
+        }
 
 
-            function spin() {
-                $(".fa").removeClass().addClass('fa fa-cog fa-spin')
-                $("#txstatus").text("与智能合约交互中。。这个过程需要1-2分钟时间，视以太坊网络情况而定")
+        function spin() {
+            $(".fa").removeClass().addClass('fa fa-cog fa-spin')
+            $("#txstatus").text("与智能合约交互中。。这个过程需要1-2分钟时间，视以太坊网络情况而定")
+        }
+
+        function stopSpin() {
+            $(".fa").removeClass().addClass('fa fa-hide')
+        }
+        var clickTime = 0;
+        function showRealSkill() {
+            clickTime++;
+            if (clickTime % 10 == 0) {
+                $('#erhu').append('<img src="erhu.gif">')
             }
+        }
 
-            function stopSpin() {
-                $(".fa").removeClass().addClass('fa fa-hide')
-            }
+    </script>
 
-        </script>
-
-    </body>
+</body>
