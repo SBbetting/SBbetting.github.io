@@ -26,23 +26,27 @@
     .q {
         font-weight: bold;
     }
+
+    .status{
+        color:green;
+        font-weight: bold;
+    }
+
 </style>
 
 
 <body>
     <div class="container">
-
-
             <header class="w3-display-container w3-content w3-wide" style="max-width:1200px;min-width:500px">
                 <br>
                 <br>
                 <br>
                     <h1>SB Betting - 赏家人世界杯大竞猜</h1>
                     <p> 
-                        合约状态:  <span id="state" style="margin-right: 30px">  </span>  <br> 
-                        奖池: <span id="pool"> </span> SB <br>
-                        你的以太坊地址: <span id="user"> </span>  <br>
-                        你拥有: <span id="sbamount"> </span> SB <br>
+                        合约状态:  <strong id="state" style="margin-right: 30px">  </strong>  <br> 
+                        目前奖池: <strong id="ETHpool"> </strong> ether  and <strong id="pool"> </strong> 赏币 <br>
+                        检测到的以太坊地址: <strong id="user"> </strong>  <br>
+                        你目前拥有 <strong id="sbamount"> </strong> 赏币 <br>
                     </p> 
                     <a id="address"> 在etherscan上查看合约 </a>
                     <br>
@@ -60,21 +64,21 @@
                         <h4> Step0: 如果没有安装Metamask请先安装Chrome Metamask插件 </h3>
                     </div>
                     <div style="margin-bottom:30px">
-                        <h4> Step1: 允许竞猜合约从你的账户取出100SB </h3>
+                        <h4> Step1: 允许竞猜合约从你的账户取出500赏币 </h3>
                         <button id="approve" onClick="approve()">允许</button>
                     </div>
             
                     <div style="margin-bottom:30px">
                         <h4> Step2: 在比赛开始前选择比分</h4>
-                        瑞典 <input type="text" id="home" placeholder="0" style="margin-bottom: 10px"> :
-                        <input type="text" id="guest" placeholder="0" style="margin-bottom: 10px">  韩国
+                        波兰 <input type="text" id="home" placeholder="0" style="margin-bottom: 10px"> :
+                        <input type="text" id="guest" placeholder="0" style="margin-bottom: 10px">  塞内加尔
                         <br>
                         <button id="confirm" onClick="bet()">确认</button>
                     </div>
 
                     <div style="margin-bottom:30px">
-                            <h4> Step3: 比赛结束后合约把奖池的SB分发给获胜的赏家人</h4>
-                            <h4> 如无人猜中正确比分，则奖池自己的累计到下一场</h4>
+                            <h4> Step3: 比赛结束后合约把奖池的ether和SB平均分发给获胜的赏家人</h4>
+                            <h4> 如无人猜中正确比分，则奖池自动累计到下一场</h4>
                     </div>
 
                     <i class="fa fa-hide"></i><br>
@@ -159,6 +163,12 @@
                 , function (err, amount) {
                     $("#sbamount").show().text(amount/1e18);
                 })
+
+                // method to get ether
+                web3.eth.getBalance(BET_CONTRACT_ADDRESSES,
+                    function (err,amount){
+                        $("#ETHpool").show().text(amount/1e18);   
+                    })
 
             }
                 
