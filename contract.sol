@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 import "./SafeMath.sol";
 
 
@@ -17,6 +17,7 @@ contract EIP20Interface {
 
 contract WorldCupGame {
     using SafeMath for uint256;
+    mapping (address=>bool) public managers; // owner list
     address public owner;
     address public tokenAddress;
     EIP20Interface public token;
@@ -43,8 +44,9 @@ contract WorldCupGame {
     States public state;
     
     function WorldCupGame(address _address) public { // constructor
+        managers[msg.sender]=true;
         owner = msg.sender;
-        betAmount = 100;
+        betAmount = 500*1e18;
         state = States.Open; // open the state
         token = EIP20Interface(_address);
         tokenAddress = _address;
@@ -53,47 +55,27 @@ contract WorldCupGame {
     
     
     function changeTokenAddress(address _address) public { // connect token to erc20 tokens
-        require(msg.sender == owner);
+        require(managers[msg.sender]);
         token = EIP20Interface(_address);
         tokenAddress = _address;
     }
     
     function changeMinAmount(uint256 _amount) public {
-         require(msg.sender == owner);
+         require(managers[msg.sender]);
          betAmount = _amount;
     }
     
     
-    // function test(address _address,uint _amount) public { // connect token to erc20 tokens
-    //     token.transfer(_address,_amount);
-    // }
-    
-    // function test1(address _from, address _to, uint _amount) public{
-    //     token.transferFrom(_from,_to,_amount);
-    // }
-    
-    // function test2(address _from, uint _amount) public{
-    //     token.transferFrom(_from,address(this),_amount);
-    // }
-    
-    // function test3(uint _amount) public{
-    //     token.transferFrom(msg.sender,address(this),_amount);
-    // }
-    
-    // function test2(address _from, address _to, uint _amount){
-    //     token.approve(address(this),_amount);
-    // }
-    
     
     function closeBetting() public{
-        require(msg.sender == owner);
+         require(managers[msg.sender]);
         state = States.Closed;
     }
     
     // bet the score
     function bet(uint _home, uint _guest) public{
         require(state == States.Open);// make sure state is open;
-        // token.approve(this,betAmount);
+      
         token.transferFrom(msg.sender,address(this),betAmount); // transfer token to the address, user needs to make an approval first
         Score memory newScore = Score({
             better: msg.sender,
@@ -115,10 +97,24 @@ contract WorldCupGame {
         return token.balanceOf(address(this));
     }
     
+        // get the betters of this game, only after game is closed
+    function getBetters() public returns(address[],uint256[],uint256[]){ //not support return struct
+        // require(state == States.Closed); // uncomment later
+        address[] betters;
+        uint256[] homeScores;
+        uint256[] guestScores;
+        for(uint i=0;i<betterCounter;i++){
+            betters.push(scores[i].better);
+            homeScores.push(scores[i].homeScore);
+            guestScores.push(scores[i].guestScore);
+        }
+        return (betters, homeScores, guestScores);
+    }
+    
 
     
     function resolveBetting(uint _home, uint _guest) public{
-        require(msg.sender==owner);
+        require(managers[msg.sender]);
         require(state == States.Closed);
         homeScoreOutcome = _home;
         guestScoreOutcome = _guest;
@@ -128,11 +124,12 @@ contract WorldCupGame {
         // resolve the winner address
         _resolveWinningResult();
         if(winnerCounter==0){
-            // no one is correct, send the token to the owner address;
-            // token.transfer(owner,totalPoolSize);
+            // no one is correct keep the token and ether in the contract
+           
         }else{ // someone get the correct guess
             for(uint256 i=0;i<winnerCounter;i<i++){
-              token.transfer(winners[i],totalPoolSize.div(winnerCounter));// the remiander should be small enough to be ignored
+              token.transfer(winners[i],totalPoolSize.div(winnerCounter));// transfer the amount of SB conin to winner
+              winners[i].transfer(address(this).balance.div(winnerCounter));// transfer the amount of ether to winner
             }
         }
         
@@ -153,10 +150,6 @@ contract WorldCupGame {
                            winners.push(scores[i].better); 
                         }
                         winnerCounter++;
-                    
-                    
-                    // winners[winnerCounter] = scores[i].better;
-                    // winnerCounter++;
                 } // the guy who win the game
         }
         return winners;
@@ -164,12 +157,20 @@ contract WorldCupGame {
     
     
     function restartGame() public{
-        require(msg.sender == owner);
+        require(managers[msg.sender]);
         winnerCounter = 0;
         betterCounter = 0;
         state = States.Open;
     }
     
+    function addManagers(address _address) public { // add managers
+         require(managers[msg.sender]);
+         managers[_address]=true;
+    }
+    
+    function () public payable{
+        // fall back do nothing
+    }
     
     
 }
