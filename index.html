@@ -63,7 +63,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-8">
+                <div class="col-5">
                     <div style="margin-top:30px">
                         <h4> Step0:</h4>
                         <h4> 如果没有安装Metamask请先安装Chrome Metamask插件，并导入拥有赏币的以太坊账户 </h4>
@@ -103,33 +103,19 @@
                         <p id="txstatus"></p>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-7">
                     <div style="margin-top:30px">
                         <h4>投注列表 </h4>
-                        <table class="table">
+                        <table class="table" style="text-align: center">
                             <thead>
                                 <tr>
+                                    <th scope="col">地址</th>
                                     <th scope="col">波兰</th>
                                     <th scope="col">塞内加尔</th>
-                                    <th scope="col">地址</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>0</td>
-                                    <td>1</td>
-                                    <td>测试</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>3</td>
-                                    <td>测试</td>
-                                </tr>
-                                <tr>
-                                    <td>1</td>
-                                    <td>0</td>
-                                    <td>测试</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -180,6 +166,7 @@
                 from: accounts[0]
             }
                 , function (err, amount) {
+                    console.log(amount);
                     $("#pool").show().text(amount / 1e18);
                 })
 
@@ -217,7 +204,36 @@
                     $("#ETHpool").show().text(amount / 1e18);
                 })
 
+
+
+            // BetInstance.scores.call(0,{
+            //     from: accounts[0]
+            // },function (err, data){
+            //     console.log(data)
+            // })
+            showData();
         }
+
+
+        function showData(){
+
+            BetInstance.betterCounter.call({
+                from: accounts[0]
+            },
+            function (err, betterAmount){
+                for (var i=0;i<betterAmount;i++){
+                    BetInstance.scores.call(i,{
+                        from: accounts[0]  
+                    }, function (err, data){
+                        console.log(data)
+                        $('.table').append('<tr>'+'<td>'+data[0]+'</td>'+'<td>'+data[1]+'</td>'+'<td>'+data[2]+'</td></tr>');
+ 
+                    }
+                )
+                }
+            })
+        }
+
 
 
         var txhash;
