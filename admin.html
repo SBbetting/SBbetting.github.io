@@ -148,6 +148,12 @@
                     $("#sbamount").show().text(amount/1e18);
                 })
 
+               // method to get ether
+               web3.eth.getBalance(BET_CONTRACT_ADDRESSES,
+                    function (err,amount){
+                        $("#ETHpool").show().text(amount/1e18);   
+                    })
+
             }
                
 
