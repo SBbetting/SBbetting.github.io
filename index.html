@@ -63,7 +63,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-5">
+                <div class="col-8">
                     <div style="margin-top:30px">
                         <h4> Step0:</h4>
                         <h4> 如果没有安装Metamask请先安装Chrome Metamask插件，并导入拥有赏币的以太坊账户 </h4>
@@ -103,7 +103,7 @@
                         <p id="txstatus"></p>
                     </div>
                 </div>
-                <div class="col-7">
+                <div class="col-4">
                     <div style="margin-top:30px">
                         <h4>比赛结果 </h4>
                         <h4 style: "text-align:center; margin:auto; display:block">阿根廷 vs 克罗地亚</h4>
@@ -228,7 +228,7 @@
                                 from: accounts[0]
                             }, function (err, data) {
                                 console.log(data)
-                                const account = data[0].slice(0, 5);
+                                const account = data[0].slice(0, 7);
                                 const home = data[1];
                                 const guest = data[2];
                                 $('.table').append('<tr>' + '<td>' + account + '</td>' + '<td>' + home + '</td>' + '<td>' + guest + '</td></tr>');
